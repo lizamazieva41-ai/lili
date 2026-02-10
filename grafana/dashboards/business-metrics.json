@@ -1,0 +1,84 @@
+{
+  "dashboard": {
+    "title": "Telegram Platform - Business Metrics",
+    "tags": ["telegram-platform", "business"],
+    "timezone": "browser",
+    "schemaVersion": 16,
+    "version": 1,
+    "refresh": "1m",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Total Messages Sent",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(messages_sent_total)",
+            "legendFormat": "Total"
+          }
+        ],
+        "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 }
+      },
+      {
+        "id": 2,
+        "title": "Total Campaigns Created",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(campaigns_created_total)",
+            "legendFormat": "Total"
+          }
+        ],
+        "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 }
+      },
+      {
+        "id": 3,
+        "title": "Message Success Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(messages_sent_total[5m]) / (rate(messages_sent_total[5m]) + rate(messages_failed_total[5m])) * 100",
+            "legendFormat": "Success Rate %"
+          }
+        ],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 }
+      },
+      {
+        "id": 4,
+        "title": "Campaigns by Type",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "sum by (campaign_type) (campaigns_created_total)",
+            "legendFormat": "{{campaign_type}}"
+          }
+        ],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 }
+      },
+      {
+        "id": 5,
+        "title": "Active Accounts by Status",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "active_telegram_accounts",
+            "legendFormat": "{{status}}"
+          }
+        ],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 }
+      },
+      {
+        "id": 6,
+        "title": "License Usage Distribution",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "license_usage_ratio",
+            "legendFormat": "{{license_id}}"
+          }
+        ],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 }
+      }
+    ]
+  }
+}

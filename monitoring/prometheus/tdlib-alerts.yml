@@ -1,0 +1,57 @@
+groups:
+  - name: tdlib
+    interval: 30s
+    rules:
+      - alert: TDLibServiceDown
+        expr: tdlib_active_clients == 0 and tdlib_sessions_total{status="active"} > 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "TDLib service is down"
+          description: "No active TDLib clients but active sessions exist. Service may be unavailable."
+
+      - alert: TDLibHighErrorRate
+        expr: rate(tdlib_errors_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High TDLib error rate"
+          description: "TDLib error rate is {{ $value }} errors/sec (threshold: 10)"
+
+      - alert: TDLibHighLatency
+        expr: histogram_quantile(0.95, rate(tdlib_request_duration_seconds_bucket[5m])) > 1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High TDLib request latency"
+          description: "P95 latency is {{ $value }}s (threshold: 1s)"
+
+      - alert: TDLibQueueBacklog
+        expr: tdlib_queue_depth > 1000
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "TDLib queue backlog"
+          description: "Queue depth is {{ $value }} (threshold: 1000)"
+
+      - alert: TDLibNoActiveSessions
+        expr: tdlib_sessions_total{status="active"} == 0
+        for: 1h
+        labels:
+          severity: info
+        annotations:
+          summary: "No active TDLib sessions"
+          description: "No active sessions for more than 1 hour"
+
+      - alert: TDLibLibraryNotFound
+        expr: tdlib_active_clients == -1
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "TDLib library not found"
+          description: "TDLib library (libtdjson.so) cannot be loaded. Check TDLIB_LIBRARY_PATH."

@@ -1,0 +1,8 @@
+{
+  "tdlib_version": "1.8.0",
+  "source": "tools-tele/td-master",
+  "commit_hash": "UNKNOWN",
+  "recorded_at": "2026-01-27T00:00:00.000Z",
+  "notes": "Pinned based on top entry in CHANGELOG.md. Update this file whenever TDLib is upgraded and keep CI/build scripts in sync. commit_hash can be updated if repository metadata is available."
+}
+

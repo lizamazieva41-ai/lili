@@ -1,0 +1,78 @@
+# Multi-stage Dockerfile for building TDLib
+# Stage 1: Build TDLib
+FROM ubuntu:22.04 AS tdlib-builder
+
+# Avoid interactive prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    g++ \
+    libssl-dev \
+    zlib1g-dev \
+    gperf \
+    make \
+    git \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /build
+
+# Copy TDLib source code from vendored vendor/tdlib/source
+# Note: Build context should be from tools-tele directory
+# Usage: docker build -f telegram-tool-backend/Dockerfile.tdlib-build -t tdlib-builder .
+COPY vendor/tdlib/source /build/vendor/tdlib/source
+
+# Create build directory
+RUN mkdir -p /build/vendor/tdlib/source/build
+
+WORKDIR /build/vendor/tdlib/source/build
+
+# Configure CMake
+RUN cmake \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/build/output \
+    -DTD_ENABLE_LTO=OFF \
+    -DTD_INSTALL_STATIC_LIBRARIES=OFF \
+    -DTD_INSTALL_SHARED_LIBRARIES=ON \
+    ..
+
+# Build only tdjson target
+RUN cmake --build . --target tdjson --config Release -- -j$(nproc || echo 4)
+
+# Install to output directory
+RUN mkdir -p /build/output/lib && \
+    if [ -f libtdjson.so ]; then \
+        cp libtdjson.so /build/output/lib/libtdjson.so; \
+    elif [ -f libtdjson.dylib ]; then \
+        cp libtdjson.dylib /build/output/lib/libtdjson.dylib; \
+    else \
+        echo "ERROR: libtdjson shared library not found" && exit 1; \
+    fi
+
+# Stage 2: Runtime image (minimal)
+FROM ubuntu:22.04 AS tdlib-runtime
+
+# Install only runtime dependencies
+RUN apt-get update && apt-get install -y \
+    libssl3 \
+    zlib1g \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy built library from builder stage
+COPY --from=tdlib-builder /build/output/lib/libtdjson.so /app/vendor/tdlib/lib/libtdjson.so
+
+# Create directory structure
+RUN mkdir -p /app/vendor/tdlib/lib
+
+# Set library path
+ENV LD_LIBRARY_PATH=/app/vendor/tdlib/lib:${LD_LIBRARY_PATH}
+
+WORKDIR /app
+
+# This stage outputs the library file
+# The actual application Dockerfile will copy from this stage

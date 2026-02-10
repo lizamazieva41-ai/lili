@@ -1,0 +1,101 @@
+[
+  {
+    "name": "td/telegram",
+    "path": "td/telegram",
+    "role": "core_client",
+    "description": "High-level Telegram client logic, TDLib objects, JSON interface (td_json_client_*).",
+    "usage": "runtime_required"
+  },
+  {
+    "name": "td/mtproto",
+    "path": "td/mtproto",
+    "role": "protocol",
+    "description": "MTProto protocol implementation (encryption, transport).",
+    "usage": "runtime_required"
+  },
+  {
+    "name": "td/generate",
+    "path": "td/generate",
+    "role": "codegen",
+    "description": "Code and TL schema generators used to build TDLib sources.",
+    "usage": "build_time"
+  },
+  {
+    "name": "td/tl",
+    "path": "td/tl",
+    "role": "tl_runtime",
+    "description": "TL (Type Language) runtime helpers for TDLib objects.",
+    "usage": "runtime_required"
+  },
+  {
+    "name": "tdactor",
+    "path": "tdactor",
+    "role": "actor_framework",
+    "description": "Internal actor framework used by TDLib for concurrency and message passing.",
+    "usage": "runtime_required"
+  },
+  {
+    "name": "tdnet",
+    "path": "tdnet",
+    "role": "network",
+    "description": "Network abstraction layer (TCP/HTTP/MTProto) used by TDLib.",
+    "usage": "runtime_required"
+  },
+  {
+    "name": "tddb",
+    "path": "tddb",
+    "role": "database",
+    "description": "Local database and persistence layer for TDLib.",
+    "usage": "runtime_required"
+  },
+  {
+    "name": "tdutils",
+    "path": "tdutils",
+    "role": "utilities",
+    "description": "Shared utilities (logging, time, file, buffer, crypto helpers, etc.).",
+    "usage": "runtime_required"
+  },
+  {
+    "name": "tdtl",
+    "path": "tdtl",
+    "role": "tl_support",
+    "description": "Additional TL support library used by TDLib.",
+    "usage": "runtime_required"
+  },
+  {
+    "name": "sqlite",
+    "path": "sqlite",
+    "role": "third_party_db",
+    "description": "Bundled SQLite used by TDLib persistence (when enabled).",
+    "usage": "runtime_required"
+  },
+  {
+    "name": "test",
+    "path": "test",
+    "role": "tests",
+    "description": "Unit and integration tests for TDLib C++.",
+    "usage": "dev_test_only"
+  },
+  {
+    "name": "benchmark",
+    "path": "benchmark",
+    "role": "benchmark",
+    "description": "Performance benchmarks for TDLib components.",
+    "usage": "dev_benchmark_only"
+  },
+  {
+    "name": "example",
+    "path": "example",
+    "role": "examples",
+    "description": "Example clients for various platforms (C++, Python, Java, C#, etc.).",
+    "usage": "dev_example_only"
+  },
+  {
+    "name": "memprof",
+    "path": "memprof",
+    "role": "tooling",
+    "description": "Memory profiling tools for TDLib.",
+    "usage": "dev_tool_only"
+  }
+]
+

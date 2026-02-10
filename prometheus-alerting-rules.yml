@@ -1,0 +1,171 @@
+groups:
+  - name: telegram_platform_alerts
+    rules:
+      # API Performance Alerts
+      - alert: HighAPIErrorRate
+        expr: rate(http_errors_total[5m]) / rate(http_requests_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          service: telegram-platform
+        annotations:
+          summary: "High API Error Rate ({{ $value | printf \"%.2f\" }})"
+          description: "API error rate is {{ $value | printf \"%.2f\" }}% over the last 5 minutes"
+
+      - alert: HighAPIResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          service: telegram-platform
+        annotations:
+          summary: "High API Response Time ({{ $value | printf \"%.2f\" }}s)"
+          description: "95th percentile API response time is {{ $value | printf \"%.2f\" }}s over the last 5 minutes"
+
+      # Message Success Rate Alerts
+      - alert: LowMessageSuccessRate
+        expr: rate(messages_failed_total[5m]) / (rate(messages_sent_total[5m]) + rate(messages_failed_total[5m])) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+          service: telegram-platform
+        annotations:
+          summary: "Low Message Success Rate ({{ $value | printf \"%.2f\" }})"
+          description: "Message success rate dropped below 90% ({{ $value | printf \"%.2f\" }}) over the last 5 minutes"
+
+      # Queue Congestion Alerts
+      - alert: QueueDepthIncreasing
+        expr: increase(queue_depth[10m]) > 100
+        for: 5m
+        labels:
+          severity: warning
+          service: telegram-platform
+        annotations:
+          summary: "Queue Depth Increasing"
+          description: "Queue depth has increased by {{ $value | printf \"%.0f\" }} in the last 10 minutes"
+
+      - alert: HighQueueDepth
+        expr: queue_depth > 1000
+        for: 5m
+        labels:
+          severity: critical
+          service: telegram-platform
+        annotations:
+          summary: "High Queue Depth ({{ $value | printf \"%.0f\" }})"
+          description: "Queue depth is {{ $value | printf \"%.0f\" }}, exceeding threshold"
+
+      # Job Failure Alerts
+      - alert: HighJobFailureRate
+        expr: rate(job_failures_total[5m]) / rate(jobs_processed_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+          service: telegram-platform
+        annotations:
+          summary: "High Job Failure Rate ({{ $value | printf \"%.2f\" }})"
+          description: "Job failure rate is {{ $value | printf \"%.2f\" }}% over the last 5 minutes"
+
+      # Database Performance Alerts
+      - alert: HighDatabaseCPU
+        expr: rate(process_cpu_user_seconds_total[5m]) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          service: telegram-platform
+        annotations:
+          summary: "High Database CPU Usage"
+          description: "Database CPU usage is above 80% for 5 minutes"
+
+      - alert: HighDatabaseMemory
+        expr: process_resident_memory_bytes / 1024 / 1024 / 1024 > 8
+        for: 5m
+        labels:
+          severity: warning
+          service: telegram-platform
+        annotations:
+          summary: "High Database Memory Usage"
+          description: "Database memory usage is above 8GB"
+
+      # License Usage Alerts
+      - alert: HighLicenseUsage
+        expr: license_usage_ratio > 0.9
+        for: 10m
+        labels:
+          severity: warning
+          service: telegram-platform
+        annotations:
+          summary: "High License Usage ({{ $value | printf \"%.1f\" }}%)"
+          description: "License usage ratio is {{ $value | printf \"%.1f\" }}% for license {{ $labels.license_id }}"
+
+      # Security Alerts
+      - alert: HighFailedLoginRate
+        expr: increase(auth_audit_log_failed_logins[5m]) > 10
+        for: 5m
+        labels:
+          severity: critical
+          service: telegram-platform
+        annotations:
+          summary: "High Failed Login Rate"
+          description: "More than 10 failed login attempts in the last 5 minutes"
+
+      - alert: SuspiciousIPActivity
+        expr: count by (ip) (increase(auth_audit_log_failed_logins[1h])) > 20
+        for: 5m
+        labels:
+          severity: warning
+          service: telegram-platform
+        annotations:
+          summary: "Suspicious IP Activity"
+          description: "IP {{ $labels.ip }} has more than 20 failed login attempts in the last hour"
+
+      # System Health Alerts
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: telegram-platform
+        annotations:
+          summary: "Service Down"
+          description: "Service {{ $labels.job }} is down"
+
+      - alert: HighMemoryUsage
+        expr: process_resident_memory_bytes / 1024 / 1024 / 1024 > 4
+        for: 10m
+        labels:
+          severity: warning
+          service: telegram-platform
+        annotations:
+          summary: "High Memory Usage"
+          description: "Memory usage is above 4GB for 10 minutes"
+
+      - alert: HighDiskUsage
+        expr: (1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes)) > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          service: telegram-platform
+        annotations:
+          summary: "High Disk Usage"
+          description: "Disk usage is above 85%"
+
+      # Business Metrics Alerts
+      - alert: SuddenUserDrop
+        expr: rate(active_users[1h]) < -0.5
+        for: 5m
+        labels:
+          severity: warning
+          service: telegram-platform
+        annotations:
+          summary: "Sudden User Activity Drop"
+          description: "Active users dropped by more than 50% in the last hour"
+
+      - alert: CampaignPerformanceDrop
+        expr: rate(campaign_success_rate[1h]) < -0.1
+        for: 10m
+        labels:
+          severity: warning
+          service: telegram-platform
+        annotations:
+          summary: "Campaign Performance Drop"
+          description: "Campaign success rate dropped by more than 10% in the last hour"

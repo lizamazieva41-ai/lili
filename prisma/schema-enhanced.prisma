@@ -1,0 +1,949 @@
+// =================================================================
+// ENHANCED PRISMA SCHEMA - TELEGRAM AUTOMATION PLATFORM v3.0
+// =================================================================
+// This schema defines a comprehensive database structure for a
+// Telegram automation platform with enterprise-grade features.
+//
+// Key Features:
+// - Advanced user management with security features
+// - Flexible licensing and billing system
+// - Sophisticated proxy management
+// - Comprehensive job processing system
+// - Telegram account management
+// - Advanced campaign system
+// - Real-time webhooks and notifications
+// - Complete audit logging and metrics
+// =================================================================
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =================================================================
+// USERS & AUTHENTICATION
+// =================================================================
+
+model User {
+  id              String   @id @default(cuid())
+  telegramId      Int      @unique
+  username        String?  @unique
+  email           String?  @unique
+  firstName       String?
+  lastName        String?
+  avatar          String?
+  language        String   @default("en")
+  isActive        Boolean  @default(true)
+  lastLoginAt     DateTime?
+  timezone        String?  @default("UTC")
+  settings        Json?    @default("{}")
+  emailVerified   Boolean  @default(false)
+  phoneVerified   Boolean  @default(false)
+  twoFactorEnabled Boolean  @default(false)
+  twoFactorSecret String?
+  accountLevel    UserAccountLevel @default(BASIC)
+  reputation      Int      @default(0) // 0-100 reputation score
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  sessions           UserSession[]
+  licenses           License[]
+  accounts           TelegramAccount[]
+  campaigns          Campaign[]
+  apiKeys            ApiKey[]
+  usageLogs          UsageLog[]
+  authAuditLogs      AuthAuditLog[]
+  securityAlerts     SecurityAlert[]
+  notifications      Notification[]
+  auditLogs          AuditLog[]
+
+  @@index([telegramId])
+  @@index([username])
+  @@index([email])
+  @@index([isActive, accountLevel])
+  @@index([createdAt])
+  @@map("users")
+}
+
+model UserSession {
+  id              String   @id @default(cuid())
+  userId          String
+  token           String   @unique
+  refreshToken    String?  @unique
+  ipAddress       String?
+  userAgent       String?
+  deviceFingerprint String?
+  isActive        Boolean  @default(true)
+  expiresAt       DateTime
+  lastActivityAt  DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activity SessionActivity[]
+
+  @@index([userId, isActive])
+  @@index([expiresAt])
+  @@index([token])
+  @@index([refreshToken])
+  @@map("user_sessions")
+}
+
+model SessionActivity {
+  id        String   @id @default(cuid())
+  sessionId String
+  action    String   // LOGIN, LOGOUT, TOKEN_REFRESH, IP_CHANGE, etc.
+  details   Json?
+  ipAddress String?
+  userAgent String?
+  location  Json?    // {country, city, timezone}
+  risk      Int?     @default(0) // 0-100 risk score
+  createdAt DateTime @default(now())
+
+  // Relations
+  session UserSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, createdAt])
+  @@index([action, createdAt])
+  @@map("session_activity")
+}
+
+model AuthAuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  event     String   // LOGIN_SUCCESS, LOGIN_FAILED, PASSWORD_CHANGE, etc.
+  metadata  Json?    // Additional event data
+  ipAddress String?
+  userAgent String?
+  severity  AuditSeverity @default(MEDIUM)
+  status    String?  @default("SUCCESS")
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, event, createdAt])
+  @@index([severity, createdAt])
+  @@map("auth_audit_log")
+}
+
+model SecurityAlert {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // SUSPICIOUS_LOGIN, BRUTE_FORCE, etc.
+  message   String
+  severity  AlertSeverity @default(MEDIUM)
+  metadata  Json?    // Alert-specific data
+  isActive  Boolean  @default(true)
+  isResolved Boolean  @default(false)
+  resolvedAt DateTime?
+  resolvedBy String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isActive, severity])
+  @@index([type, createdAt])
+  @@map("security_alerts")
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String   // SECURITY, MARKETING, SYSTEM, etc.
+  title       String
+  message     String
+  data        Json?    // Additional notification data
+  isRead      Boolean  @default(false)
+  priority    NotificationPriority @default(MEDIUM)
+  channels    Json?    // ["email", "push", "in_app"]
+  deliveredAt DateTime?
+  readAt      DateTime?
+  expiresAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([type, priority])
+  @@index([expiresAt])
+  @@map("notifications")
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String?
+  entityType  String   // USER, ACCOUNT, CAMPAIGN, etc.
+  entityId    String
+  action      String   // CREATE, UPDATE, DELETE, VIEW, etc.
+  oldValues   Json?    // Before state
+  newValues   Json?    // After state
+  metadata    Json?    // Additional context
+  ipAddress   String?
+  userAgent   String?
+  apiKey      String?
+  createdAt   DateTime @default(now())
+
+  // Relations
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId, action])
+  @@index([userId, createdAt])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// =================================================================
+// LICENSING & BILLING
+// =================================================================
+
+model License {
+  id              String        @id @default(cuid())
+  userId          String
+  plan            LicensePlan
+  status          LicenseStatus
+  billingCycle    BillingCycle  @default(MONTHLY)
+  expiresAt       DateTime?
+  trialEndsAt     DateTime?
+  autoRenew       Boolean       @default(true)
+  features        Json          // Enabled features
+  limits          Json          // Plan limits
+  usage           Json          @default("{}") // Current usage stats
+  paymentMethodId String?
+  subscriptionId  String?       // External subscription ID
+  lastBilledAt    DateTime?
+  nextBillingAt   DateTime?
+  cancelledAt     DateTime?
+  cancellationReason String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  apiKeys         ApiKey[]
+  usageLogs       UsageLog[]
+  payments        Payment[]
+  invoices        Invoice[]
+  licenseMetrics  LicenseMetrics[]
+
+  @@index([userId, status])
+  @@index([expiresAt])
+  @@index([subscriptionId])
+  @@index([nextBillingAt])
+  @@map("licenses")
+}
+
+model ApiKey {
+  id              String    @id @default(cuid())
+  licenseId       String
+  name            String
+  key             String    @unique
+  keyHash         String    @unique // Hashed version for security
+  permissions     Json      // {"permissions": ["read", "write"], "resources": ["accounts", "campaigns"]}
+  rateLimit       Json?     // Custom rate limits per key
+  isActive        Boolean   @default(true)
+  lastUsedAt      DateTime?
+  expiresAt       DateTime?
+  usageCount      Int       @default(0)
+  usageLimit      Int?      // Usage limit per period
+  usagePeriod     String    @default("daily") // daily, monthly, yearly
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  license         License   @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  apiKeyUsage     ApiKeyUsage[]
+
+  @@index([licenseId, isActive])
+  @@index([keyHash])
+  @@index([expiresAt])
+  @@map("api_keys")
+}
+
+model ApiKeyUsage {
+  id          String   @id @default(cuid())
+  apiKeyId    String
+  date        DateTime @default(now()) @db.Date
+  requests    Int      @default(0)
+  bytes       BigInt   @default(0)
+  errors      Int      @default(0)
+  avgResponseTime Float?  // in milliseconds
+  createdAt   DateTime @default(now())
+
+  // Relations
+  apiKey      ApiKey    @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+
+  @@unique([apiKeyId, date])
+  @@index([date])
+  @@map("api_key_usage")
+}
+
+model UsageLog {
+  id          String   @id @default(cuid())
+  userId      String
+  licenseId   String
+  apiKeyId    String?
+  action      String   // API_CALL, MESSAGE_SENT, etc.
+  resource    String?  // Resource type
+  resourceId  String?  // Resource ID
+  metadata    Json?    // Additional usage data
+  cost        Decimal? @db.Decimal(10, 4) // Cost in USD
+  ipAddress   String?
+  userAgent   String?
+  responseTime Int?     // Response time in ms
+  statusCode  Int?      // HTTP status code
+  createdAt   DateTime @default(now())
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  license     License  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+
+  @@index([userId, action, createdAt])
+  @@index([licenseId, createdAt])
+  @@index([apiKeyId, createdAt])
+  @@index([action, createdAt])
+  @@map("usage_logs")
+}
+
+model LicenseMetrics {
+  id              String   @id @default(cuid())
+  licenseId       String
+  date            DateTime @default(now()) @db.Date
+  totalRequests   Int      @default(0)
+  totalMessages   Int      @default(0)
+  totalCost       Decimal  @default(0) @db.Decimal(10, 4)
+  activeAccounts  Int      @default(0)
+  activeCampaigns Int      @default(0)
+  storageUsed     BigInt   @default(0) // in bytes
+  bandwidthUsed   BigInt   @default(0) // in bytes
+  createdAt       DateTime @default(now())
+
+  // Relations
+  license         License  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+
+  @@unique([licenseId, date])
+  @@index([date])
+  @@map("license_metrics")
+}
+
+model Payment {
+  id              String      @id @default(cuid())
+  licenseId       String
+  amount          Decimal     @db.Decimal(10, 2)
+  currency        String      @default("USD")
+  status          PaymentStatus
+  method          PaymentMethod
+  transactionId   String?     @unique // External transaction ID
+  gateway         String      // stripe, paypal, etc.
+  gatewayResponse Json?       // Gateway response data
+  failureReason   String?
+  processedAt     DateTime?
+  refundedAt      DateTime?
+  refundAmount    Decimal?    @db.Decimal(10, 2)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // Relations
+  license         License     @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  invoice         Invoice?
+
+  @@index([licenseId, status])
+  @@index([transactionId])
+  @@index([gateway, status])
+  @@index([processedAt])
+  @@map("payments")
+}
+
+model Invoice {
+  id              String      @id @default(cuid())
+  licenseId       String
+  invoiceNumber   String      @unique
+  amount          Decimal     @db.Decimal(10, 2)
+  currency        String      @default("USD")
+  status          InvoiceStatus
+  dueDate         DateTime
+  paidAt          DateTime?
+  items           Json        // Invoice items
+  taxAmount       Decimal     @default(0) @db.Decimal(10, 2)
+  totalAmount     Decimal     @db.Decimal(10, 2)
+  paymentId       String?
+  pdfUrl          String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // Relations
+  license         License     @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  payments        Payment[]
+
+  @@index([licenseId, status])
+  @@index([dueDate])
+  @@index([status, dueDate])
+  @@map("invoices")
+}
+
+// =================================================================
+// PROXY MANAGEMENT
+// =================================================================
+
+model Proxy {
+  id              String     @id @default(cuid())
+  name            String?
+  type            ProxyType
+  host            String
+  port            Int
+  username        String?
+  password        String?    // Encrypted
+  country         String?    @default("Unknown")
+  region          String?    @default("Unknown")
+  city            String?
+  isp             String?
+  asn             String?
+  status          ProxyStatus @default(INACTIVE)
+  healthScore     Int        @default(100) // 0-100 health score
+  responseTime    Int?       // Average response time in ms
+  uptime          Float?     @default(0.0) // Uptime percentage
+  lastChecked     DateTime?
+  lastUsedAt      DateTime?
+  maxConnections  Int        @default(10)
+  currentConnections Int      @default(0)
+  bandwidthLimit  BigInt?    // Bandwidth limit in bytes
+  bandwidthUsed   BigInt     @default(0) // Current bandwidth usage
+  protocols       Json?      // Supported protocols
+  features        Json?      // Additional proxy features
+  tags            String[]    @default([]) // Tags for grouping
+  notes           String?
+  isActive        Boolean    @default(true)
+  createdBy       String?    // User ID who created this proxy
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  // Relations
+  accountAssignments AccountProxyAssignment[]
+  healthLogs       ProxyHealthLog[]
+  usageStats       ProxyUsageStats[]
+  proxyMetrics     ProxyMetric[]
+
+  @@index([status, isActive])
+  @@index([country, region])
+  @@index([type, healthScore])
+  @@index([lastChecked])
+  @@unique([host, port])
+  @@index([tags])
+  @@map("proxies")
+}
+
+model AccountProxyAssignment {
+  id          String   @id @default(cuid())
+  accountId   String
+  proxyId     String
+  isActive    Boolean  @default(true)
+  priority    Int      @default(0) // Priority for load balancing
+  weight      Float    @default(1.0) // Weight for weighted routing
+  assignedAt  DateTime @default(now())
+  lastUsedAt  DateTime?
+  usageCount  Int      @default(0)
+  settings    Json?    // Assignment-specific settings
+
+  // Relations
+  account TelegramAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  proxy   Proxy           @relation(fields: [proxyId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, proxyId])
+  @@index([accountId, isActive])
+  @@index([proxyId, isActive])
+  @@map("account_proxy_assignments")
+}
+
+model ProxyHealthLog {
+  id            String   @id @default(cuid())
+  proxyId       String
+  testType      String   @default("CONNECTIVITY") // CONNECTIVITY, SPEED, ANONYMITY
+  isHealthy     Boolean
+  responseTime  Int?     // Response time in milliseconds
+  downloadSpeed Float?   // Download speed in Mbps
+  uploadSpeed   Float?   // Upload speed in Mbps
+  error         String?
+  errorMessage  String?
+  metadata      Json?    // Test metadata
+  ipAddress     String?   // Detected IP address
+  country       String?   // Detected country
+  anonymityLevel String?  // DETECTED, NONE, LOW, MEDIUM, HIGH
+  createdAt     DateTime @default(now())
+
+  // Relations
+  proxy Proxy @relation(fields: [proxyId], references: [id], onDelete: Cascade)
+
+  @@index([proxyId, createdAt])
+  @@index([testType, isHealthy])
+  @@map("proxy_health_logs")
+}
+
+model ProxyUsageStats {
+  id              String   @id @default(cuid())
+  proxyId         String
+  date            DateTime @default(now()) @db.Date
+  hour            Int      @default(0) // 0-23 for hourly stats
+  requests        Int      @default(0)
+  successfulRequests Int     @default(0)
+  failedRequests  Int      @default(0)
+  bytesTransferred BigInt   @default(0) // Total bytes transferred
+  avgResponseTime Float?   // Average response time
+  peakConnections Int      @default(0) // Peak concurrent connections
+  errors          Json?     // Error breakdown
+  topDestinations  Json?     // Top destination countries
+  createdAt       DateTime @default(now())
+
+  // Relations
+  proxy Proxy @relation(fields: [proxyId], references: [id], onDelete: Cascade)
+
+  @@unique([proxyId, date, hour])
+  @@index([date])
+  @@map("proxy_usage_stats")
+}
+
+model ProxyMetric {
+  id              String   @id @default(cuid())
+  proxyId         String
+  date            DateTime @default(now()) @db.Date
+  uptime          Float    @default(0.0) // Uptime percentage
+  avgResponseTime Float?   // Average response time
+  successRate     Float    @default(0.0) // Success rate percentage
+  totalRequests   Int      @default(0)
+  totalBytes      BigInt   @default(0)
+  errorRate       Float    @default(0.0) // Error rate percentage
+  bandwidthUsage  BigInt   @default(0) // Bandwidth used in bytes
+  createdAt       DateTime @default(now())
+
+  // Relations
+  proxy Proxy @relation(fields: [proxyId], references: [id], onDelete: Cascade)
+
+  @@unique([proxyId, date])
+  @@index([date])
+  @@map("proxy_metrics")
+}
+
+// =================================================================
+// JOB PROCESSING & QUEUES
+// =================================================================
+
+model Job {
+  id              String     @id @default(cuid())
+  type            JobType
+  queue           String     @default("default")
+  priority        Int        @default(0) // Higher number = higher priority
+  data            Json       // Job data/payload
+  status          JobStatus  @default(PENDING)
+  attempts        Int        @default(0)
+  maxAttempts     Int        @default(3)
+  delay           Int?       // Delay in milliseconds before execution
+  backoff         Json?      // Backoff strategy configuration
+  timeout         Int?       // Job timeout in milliseconds
+  cronExpression  String?    // For recurring jobs
+  nextRunAt       DateTime?
+  scheduledAt     DateTime?
+  startedAt       DateTime?
+  completedAt     DateTime?
+  failedAt        DateTime?
+  error           String?
+  errorMessage    String?
+  result          Json?
+  progress        Float?     @default(0.0) // 0.0 to 1.0 for progress tracking
+  metadata        Json?      // Additional job metadata
+  parentId        String?     // For job chains/dependencies
+  userId          String?     // User who created the job
+  sessionId       String?     // Session that created the job
+  apiKeyId        String?     // API key that created the job
+  workerId        String?     // ID of worker processing the job
+  workerProcessId String?     // Process ID of worker
+  tags            String[]   @default([]) // Job tags for filtering
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  // Relations
+  executions      JobExecution[]
+  jobDependencies JobDependency[] @relation("JobDependents")
+  dependsOn       JobDependency[] @relation("JobDependencies")
+  jobMetrics      JobMetric[]
+  jobLogs         JobLog[]
+
+  @@index([status, priority, createdAt])
+  @@index([queue, status])
+  @@index([type, status])
+  @@index([scheduledAt])
+  @@index([userId])
+  @@index([parentId])
+  @@map("jobs")
+}
+
+model JobExecution {
+  id            String   @id @default(cuid())
+  jobId         String
+  attempt       Int
+  status        String   @default("RUNNING")
+  startedAt     DateTime @default(now())
+  finishedAt    DateTime?
+  duration      Int?     // Duration in milliseconds
+  progress      Float?   @default(0.0)
+  output        String?  // Job output/logs
+  error         String?
+  errorMessage  String?
+  stackTrace    String?  // Error stack trace
+  metadata      Json?    // Execution metadata
+  workerId      String?  // Worker that processed this execution
+  host          String?  // Host where job was processed
+  createdAt     DateTime @default(now())
+
+  // Relations
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId, attempt])
+  @@index([status, startedAt])
+  @@map("job_executions")
+}
+
+model JobDependency {
+  id         String @id @default(cuid())
+  jobId      String
+  dependsOnId String
+  dependencyType String @default("SUCCESS") // SUCCESS, COMPLETION, etc.
+  createdAt  DateTime @default(now())
+
+  // Relations
+  job     Job @relation("JobDependents", fields: [jobId], references: [id], onDelete: Cascade)
+  dependsOn Job @relation("JobDependencies", fields: [dependsOnId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, dependsOnId])
+  @@map("job_dependencies")
+}
+
+model JobMetric {
+  id          String   @id @default(cuid())
+  jobId       String
+  date        DateTime @default(now()) @db.Date
+  count       Int      @default(0)
+  successCount Int     @default(0)
+  failureCount Int     @default(0)
+  avgDuration Float?    // Average duration in ms
+  minDuration Int?     // Minimum duration in ms
+  maxDuration Int?     // Maximum duration in ms
+  totalDuration BigInt   @default(0) // Total duration in ms
+  queueTime   BigInt   @default(0) // Average time in queue in ms
+  createdAt   DateTime @default(now())
+
+  // Relations
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, date])
+  @@index([date])
+  @@map("job_metrics")
+}
+
+model JobLog {
+  id        String   @id @default(cuid())
+  jobId     String
+  level     String   @default("INFO") // DEBUG, INFO, WARN, ERROR
+  message   String
+  metadata  Json?    // Log metadata
+  timestamp DateTime @default(now())
+
+  // Relations
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId, level, timestamp])
+  @@map("job_logs")
+}
+
+model Queue {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  maxSize     Int      @default(10000)
+  delay       Int      @default(0)
+  maxRetries  Int      @default(3)
+  backoff     Json?    // Backoff configuration
+  isActive    Boolean  @default(true)
+  concurrency Int      @default(5) // Max concurrent jobs
+  settings    Json?    // Queue-specific settings
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  queueMetrics QueueMetric[]
+
+  @@index([name, isActive])
+  @@map("queues")
+}
+
+model QueueMetric {
+  id            String   @id @default(cuid())
+  queueId       String
+  date          DateTime @default(now()) @db.Date
+  jobsProcessed  Int      @default(0)
+  jobsFailed     Int      @default(0)
+  jobsCompleted  Int      @default(0)
+  avgWaitTime   Float?   // Average wait time in ms
+  avgProcessTime Float?   // Average process time in ms
+  throughput    Float?   // Jobs per second
+  createdAt     DateTime @default(now())
+
+  // Relations
+  queue Queue @relation(fields: [queueId], references: [id], onDelete: Cascade)
+
+  @@unique([queueId, date])
+  @@index([date])
+  @@map("queue_metrics")
+}
+
+// =================================================================
+// ENUMS DEFINITIONS
+// =================================================================
+
+// User & Account Enums
+enum UserAccountLevel {
+  BASIC
+  PREMIUM
+  ENTERPRISE
+  CUSTOM
+}
+
+enum AuditSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum AlertSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum NotificationPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+// License & Billing Enums
+enum LicensePlan {
+  BASIC
+  PREMIUM
+  ENTERPRISE
+  CUSTOM
+}
+
+enum LicenseStatus {
+  ACTIVE
+  EXPIRED
+  SUSPENDED
+  CANCELLED
+  PENDING
+  TRIAL
+}
+
+enum BillingCycle {
+  MONTHLY
+  QUARTERLY
+  YEARLY
+  LIFETIME
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  PAYPAL
+  BANK_TRANSFER
+  CRYPTO
+  STRIPE
+  OTHER
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+  REFUNDED
+}
+
+// Proxy Enums
+enum ProxyType {
+  HTTP
+  HTTPS
+  SOCKS4
+  SOCKS5
+  SOCKS4A
+  SOCKS5_WITH_UDP
+}
+
+enum ProxyStatus {
+  ACTIVE
+  INACTIVE
+  ERROR
+  TESTING
+  MAINTENANCE
+  BANNED
+}
+
+// Job & Queue Enums
+enum JobType {
+  MESSAGE_SEND
+  ACCOUNT_HEALTH_CHECK
+  PROXY_TEST
+  CAMPAIGN_EXECUTE
+  WEBHOOK_SEND
+  CLEANUP_TASK
+  BACKUP_TASK
+  ANALYTICS_TASK
+  NOTIFICATION_SEND
+  USAGE_REPORT
+  SECURITY_CHECK
+  DATA_SYNC
+  PROXY_ROTATION
+  ACCOUNT_VERIFICATION
+  CAMPAIGN_ANALYTICS
+}
+
+enum JobStatus {
+  PENDING
+  WAITING
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+  PAUSED
+  DELAYED
+  RETRYING
+}
+
+// Telegram Account Enums
+enum AccountStatus {
+  ACTIVE
+  INACTIVE
+  BANNED
+  RESTRICTED
+  ARCHIVED
+  SUSPENDED
+  DELETED
+  PENDING_VERIFICATION
+}
+
+enum AccountVerification {
+  NONE
+  BASIC
+  FULL
+  PREMIUM
+}
+
+enum AccountEventType {
+  LOGIN_SUCCESS
+  LOGIN_FAILED
+  MESSAGE_SENT
+  MESSAGE_FAILED
+  ACCOUNT_BANNED
+  ACCOUNT_RESTRICTED
+  SUSPICIOUS_ACTIVITY
+  PROXY_CHANGED
+  SETTINGS_UPDATED
+  WARNING_RECEIVED
+  ERROR_OCCURRED
+  COOLDOWN_STARTED
+  COOLDOWN_ENDED
+}
+
+enum EventSeverity {
+  INFO
+  WARNING
+  ERROR
+  CRITICAL
+}
+
+// Campaign & Message Enums
+enum CampaignType {
+  BULK
+  PERSONALIZED
+  SCHEDULED
+  RECURRING
+  AUTOMATED
+  TRIGGERED
+  A_B_TEST
+  DRIP_CAMPAIGN
+}
+
+enum CampaignStatus {
+  DRAFT
+  SCHEDULED
+  RUNNING
+  PAUSED
+  COMPLETED
+  CANCELLED
+  FAILED
+  APPROVED
+  REJECTED
+  ANALYZING
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  VIDEO
+  AUDIO
+  DOCUMENT
+  VOICE
+  STICKER
+  ANIMATION
+  CONTACT
+  LOCATION
+  VENUE
+  POLL
+  GAME
+  INVOICE
+  QUOTE
+  FORWARD
+  MEDIA_GROUP
+}
+
+enum MessageStatus {
+  PENDING
+  QUEUED
+  SENT
+  DELIVERED
+  READ
+  FAILED
+  CANCELLED
+  BOUNCED
+  COMPLAINED
+  UNSUBSCRIBED
+}
+
+// Webhook Enums
+enum WebhookStatus {
+  ACTIVE
+  INACTIVE
+  ERROR
+  DISABLED
+}

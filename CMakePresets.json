@@ -1,0 +1,78 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 10,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "Default TDLib Build",
+      "description": "Default build configuration for TDLib",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/vendor/tdlib/source/build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/vendor/tdlib",
+        "TD_ENABLE_LTO": "OFF",
+        "TD_INSTALL_STATIC_LIBRARIES": "OFF",
+        "TD_INSTALL_SHARED_LIBRARIES": "ON"
+      }
+    },
+    {
+      "name": "debug",
+      "displayName": "Debug TDLib Build",
+      "description": "Debug build configuration for TDLib",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/vendor/tdlib/source/build-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/vendor/tdlib",
+        "TD_ENABLE_LTO": "OFF",
+        "TD_INSTALL_STATIC_LIBRARIES": "OFF",
+        "TD_INSTALL_SHARED_LIBRARIES": "ON"
+      }
+    },
+    {
+      "name": "docker",
+      "displayName": "Docker Build",
+      "description": "Build configuration for Docker environment",
+      "generator": "Unix Makefiles",
+      "binaryDir": "/build/tdlib-source/build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_INSTALL_PREFIX": "/build/output",
+        "TD_ENABLE_LTO": "OFF",
+        "TD_INSTALL_STATIC_LIBRARIES": "OFF",
+        "TD_INSTALL_SHARED_LIBRARIES": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "default",
+      "displayName": "Default Build",
+      "configurePreset": "default",
+      "targets": [
+        "tdjson"
+      ]
+    },
+    {
+      "name": "debug",
+      "displayName": "Debug Build",
+      "configurePreset": "debug",
+      "targets": [
+        "tdjson"
+      ]
+    },
+    {
+      "name": "docker",
+      "displayName": "Docker Build",
+      "configurePreset": "docker",
+      "targets": [
+        "tdjson"
+      ]
+    }
+  ]
+}

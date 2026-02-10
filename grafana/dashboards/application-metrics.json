@@ -1,0 +1,108 @@
+{
+  "dashboard": {
+    "title": "Telegram Platform - Application Metrics",
+    "tags": ["telegram-platform", "application"],
+    "timezone": "browser",
+    "schemaVersion": 16,
+    "version": 1,
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Messages Sent",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(messages_sent_total[5m])",
+            "legendFormat": "Messages/sec"
+          }
+        ],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 }
+      },
+      {
+        "id": 2,
+        "title": "Messages Failed",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(messages_failed_total[5m])",
+            "legendFormat": "Failed/sec"
+          }
+        ],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 }
+      },
+      {
+        "id": 3,
+        "title": "Active Campaigns",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "active_campaigns",
+            "legendFormat": "{{status}}"
+          }
+        ],
+        "gridPos": { "h": 4, "w": 6, "x": 0, "y": 8 }
+      },
+      {
+        "id": 4,
+        "title": "Active Users",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "active_users",
+            "legendFormat": "Users"
+          }
+        ],
+        "gridPos": { "h": 4, "w": 6, "x": 6, "y": 8 }
+      },
+      {
+        "id": 5,
+        "title": "Jobs Processed",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(jobs_processed_total[5m])",
+            "legendFormat": "{{queue}} {{job_type}}"
+          }
+        ],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 }
+      },
+      {
+        "id": 6,
+        "title": "Job Failures",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(job_failures_total[5m])",
+            "legendFormat": "{{queue}} {{job_type}}"
+          }
+        ],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 }
+      },
+      {
+        "id": 7,
+        "title": "Cache Hit Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(cache_hits_total[5m]) / (rate(cache_hits_total[5m]) + rate(cache_misses_total[5m]))",
+            "legendFormat": "Hit Rate"
+          }
+        ],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 }
+      },
+      {
+        "id": 8,
+        "title": "License Usage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "license_usage_ratio",
+            "legendFormat": "{{license_id}}"
+          }
+        ],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 }
+      }
+    ]
+  }
+}

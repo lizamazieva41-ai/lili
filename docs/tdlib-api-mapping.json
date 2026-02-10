@@ -1,0 +1,692 @@
+[
+  {
+    "tdApiMethod": "setAuthenticationPhoneNumber",
+    "nodeEndpoint": "POST /tdlib/auth/request-code",
+    "service": "TdlibAuthService.requestCode",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "checkAuthenticationCode",
+    "nodeEndpoint": "POST /tdlib/auth/confirm-code",
+    "service": "TdlibAuthService.confirmCode",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "checkAuthenticationPassword",
+    "nodeEndpoint": "POST /tdlib/auth/confirm-password",
+    "service": "TdlibAuthService.confirmPassword",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "resendAuthenticationCode",
+    "nodeEndpoint": "POST /tdlib/auth/resend-code",
+    "service": "TdlibAuthService.resendCode",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getMe",
+    "nodeEndpoint": "GET /tdlib/me",
+    "service": "TdlibService.getMe",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getChats",
+    "nodeEndpoint": "GET /tdlib/chats",
+    "service": "TdlibService.getChats",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "searchContacts",
+    "nodeEndpoint": "GET /tdlib/contacts/search",
+    "service": "TdlibService.searchContacts",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "addProxy",
+    "nodeEndpoint": "POST /tdlib/proxy",
+    "service": "TdlibService.setProxy",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "sendMessage",
+    "nodeEndpoint": "POST /tdlib/messages/send",
+    "service": "TdlibService.sendMessage",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getMessage",
+    "nodeEndpoint": "GET /tdlib/messages/:clientId/:chatId/:messageId",
+    "service": "TdlibMessageService.getMessage",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getMessages",
+    "nodeEndpoint": "POST /tdlib/messages/batch",
+    "service": "TdlibMessageService.getMessages",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "editMessageText",
+    "nodeEndpoint": "POST /tdlib/messages/edit",
+    "service": "TdlibMessageService.editMessageText",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "deleteMessages",
+    "nodeEndpoint": "POST /tdlib/messages/delete",
+    "service": "TdlibMessageService.deleteMessages",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "forwardMessages",
+    "nodeEndpoint": "POST /tdlib/messages/forward",
+    "service": "TdlibMessageService.forwardMessages",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "sendMessageAlbum",
+    "nodeEndpoint": "POST /tdlib/messages/album",
+    "service": "TdlibMessageService.sendMessageAlbum",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getMessageThread",
+    "nodeEndpoint": "GET /tdlib/messages/:clientId/:chatId/:messageId/thread",
+    "service": "TdlibMessageService.getMessageThread",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getMessageLink",
+    "nodeEndpoint": "GET /tdlib/messages/:clientId/:chatId/:messageId/link",
+    "service": "TdlibMessageService.getMessageLink",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getMessageLocally",
+    "nodeEndpoint": "GET /tdlib/messages/:clientId/:chatId/:messageId/local",
+    "service": "TdlibMessageService.getMessageLocally",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "downloadFile",
+    "nodeEndpoint": "POST /tdlib/files/download",
+    "service": "TdlibFileService.downloadFile",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "uploadFile",
+    "nodeEndpoint": "POST /tdlib/files/upload",
+    "service": "TdlibFileService.uploadFile",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getFile",
+    "nodeEndpoint": "GET /tdlib/files/:clientId/:fileId",
+    "service": "TdlibFileService.getFile",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "cancelDownloadFile",
+    "nodeEndpoint": "POST /tdlib/files/cancel-download",
+    "service": "TdlibFileService.cancelDownloadFile",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getRemoteFile",
+    "nodeEndpoint": "GET /tdlib/files/:clientId/remote/:remoteFileId",
+    "service": "TdlibFileService.getRemoteFile",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "createPrivateChat",
+    "nodeEndpoint": "POST /tdlib/chats/private",
+    "service": "TdlibChatService.createPrivateChat",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "createBasicGroupChat",
+    "nodeEndpoint": "POST /tdlib/chats/group",
+    "service": "TdlibChatService.createGroupChat",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "createSupergroupChat",
+    "nodeEndpoint": "POST /tdlib/chats/supergroup",
+    "service": "TdlibChatService.createSupergroupChat",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getChat",
+    "nodeEndpoint": "GET /tdlib/chats/:clientId/:chatId",
+    "service": "TdlibChatService.getChat",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getChatHistory",
+    "nodeEndpoint": "GET /tdlib/chats/:clientId/:chatId/history",
+    "service": "TdlibChatService.getChatHistory",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "searchChatMessages",
+    "nodeEndpoint": "POST /tdlib/chats/search",
+    "service": "TdlibChatService.searchChatMessages",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getChatMember",
+    "nodeEndpoint": "GET /tdlib/chats/:clientId/:chatId/members/:memberId",
+    "service": "TdlibChatService.getChatMember",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getChatMembers",
+    "nodeEndpoint": "GET /tdlib/chats/:clientId/:chatId/members",
+    "service": "TdlibChatService.getChatMembers",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "pinChatMessage",
+    "nodeEndpoint": "POST /tdlib/messages/pin",
+    "service": "TdlibMessageService.pinMessage",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "unpinChatMessage",
+    "nodeEndpoint": "POST /tdlib/messages/unpin",
+    "service": "TdlibMessageService.unpinMessage",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "unpinAllChatMessages",
+    "nodeEndpoint": "POST /tdlib/messages/unpin-all",
+    "service": "TdlibMessageService.unpinAllMessages",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "readMessageContents",
+    "nodeEndpoint": "POST /tdlib/messages/read-contents",
+    "service": "TdlibMessageService.readMessageContents",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "readAllMessageMentions",
+    "nodeEndpoint": "POST /tdlib/messages/read-mentions",
+    "service": "TdlibMessageService.readAllMessageMentions",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "readAllMessageReactions",
+    "nodeEndpoint": "POST /tdlib/messages/read-reactions",
+    "service": "TdlibMessageService.readAllMessageReactions",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getMessageStatistics",
+    "nodeEndpoint": "GET /tdlib/messages/statistics/:clientId/:chatId/:messageId",
+    "service": "TdlibMessageService.getMessageStatistics",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getMessagePublicForwards",
+    "nodeEndpoint": "GET /tdlib/messages/public-forwards/:clientId/:chatId/:messageId",
+    "service": "TdlibMessageService.getMessagePublicForwards",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "reportMessage",
+    "nodeEndpoint": "POST /tdlib/messages/report",
+    "service": "TdlibMessageService.reportMessage",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getMessageReadDate",
+    "nodeEndpoint": "GET /tdlib/messages/read-date/:clientId/:chatId/:messageId",
+    "service": "TdlibMessageService.getMessageReadDate",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getMessageAddedReactions",
+    "nodeEndpoint": "GET /tdlib/messages/reactions/:clientId/:chatId/:messageId",
+    "service": "TdlibMessageService.getMessageAddedReactions",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "addMessageReaction",
+    "nodeEndpoint": "POST /tdlib/messages/reaction/add",
+    "service": "TdlibMessageService.addMessageReaction",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "removeMessageReaction",
+    "nodeEndpoint": "POST /tdlib/messages/reaction/remove",
+    "service": "TdlibMessageService.removeMessageReaction",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "setMessageReactions",
+    "nodeEndpoint": "POST /tdlib/messages/reaction/set",
+    "service": "TdlibMessageService.setMessageReaction",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getMessageAvailableReactions",
+    "nodeEndpoint": "GET /tdlib/messages/available-reactions/:clientId/:chatId/:messageId",
+    "service": "TdlibMessageService.getMessageAvailableReactions",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "searchMessages",
+    "nodeEndpoint": "POST /tdlib/messages/search",
+    "service": "TdlibMessageService.searchMessages",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getMessageEmbeddingCode",
+    "nodeEndpoint": "GET /tdlib/messages/embedding-code/:clientId/:chatId/:messageId",
+    "service": "TdlibMessageService.getMessageEmbeddingCode",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getMessageLinkInfo",
+    "nodeEndpoint": "POST /tdlib/messages/link-info",
+    "service": "TdlibMessageService.getMessageLinkInfo",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "translateMessageText",
+    "nodeEndpoint": "POST /tdlib/messages/translate",
+    "service": "TdlibMessageService.translateMessageText",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "reportMessageReactions",
+    "nodeEndpoint": "POST /tdlib/messages/reactions/report",
+    "service": "TdlibMessageService.reportMessageReactions",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getUser",
+    "nodeEndpoint": "GET /tdlib/users/:clientId/:userId",
+    "service": "TdlibUserService.getUser",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getUserFullInfo",
+    "nodeEndpoint": "GET /tdlib/users/full-info/:clientId/:userId",
+    "service": "TdlibUserService.getUserFullInfo",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getUserProfilePhotos",
+    "nodeEndpoint": "GET /tdlib/users/profile-photos/:clientId/:userId",
+    "service": "TdlibUserService.getUserProfilePhotos",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "setUserPersonalProfilePhoto",
+    "nodeEndpoint": "POST /tdlib/users/profile-photo/personal",
+    "service": "TdlibUserService.setUserPersonalProfilePhoto",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "setUserProfilePhoto",
+    "nodeEndpoint": "POST /tdlib/users/profile-photo",
+    "service": "TdlibUserService.setUserProfilePhoto",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "deleteUserProfilePhoto",
+    "nodeEndpoint": "POST /tdlib/users/profile-photo/delete",
+    "service": "TdlibUserService.deleteUserProfilePhoto",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "setUsername",
+    "nodeEndpoint": "POST /tdlib/users/username",
+    "service": "TdlibUserService.setUsername",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "setBio",
+    "nodeEndpoint": "POST /tdlib/users/bio",
+    "service": "TdlibUserService.setBio",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "setCommands",
+    "nodeEndpoint": "POST /tdlib/users/commands/set",
+    "service": "TdlibUserService.setCommands",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getCommands",
+    "nodeEndpoint": "POST /tdlib/users/commands/get",
+    "service": "TdlibUserService.getCommands",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "deleteCommands",
+    "nodeEndpoint": "POST /tdlib/users/commands/delete",
+    "service": "TdlibUserService.deleteCommands",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getActiveSessions",
+    "nodeEndpoint": "GET /tdlib/users/sessions/:clientId",
+    "service": "TdlibUserService.getActiveSessions",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "terminateSession",
+    "nodeEndpoint": "POST /tdlib/users/sessions/terminate",
+    "service": "TdlibUserService.terminateSession",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "terminateAllOtherSessions",
+    "nodeEndpoint": "POST /tdlib/users/sessions/terminate-all-other",
+    "service": "TdlibUserService.terminateAllOtherSessions",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "toggleSessionCanAcceptCalls",
+    "nodeEndpoint": "POST /tdlib/users/sessions/toggle-calls",
+    "service": "TdlibUserService.toggleSessionCanAcceptCalls",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "toggleSessionCanAcceptSecretChats",
+    "nodeEndpoint": "POST /tdlib/users/sessions/toggle-secret-chats",
+    "service": "TdlibUserService.toggleSessionCanAcceptSecretChats",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "setInactiveSessionTtl",
+    "nodeEndpoint": "POST /tdlib/users/sessions/inactive-ttl",
+    "service": "TdlibUserService.setInactiveSessionTtl",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getConnectedWebsites",
+    "nodeEndpoint": "GET /tdlib/users/websites/:clientId",
+    "service": "TdlibUserService.getConnectedWebsites",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "disconnectWebsite",
+    "nodeEndpoint": "POST /tdlib/users/websites/disconnect",
+    "service": "TdlibUserService.disconnectWebsite",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "createChannel",
+    "nodeEndpoint": "POST /tdlib/channels/create",
+    "service": "TdlibChannelService.createChannel",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getChannel",
+    "nodeEndpoint": "GET /tdlib/channels/:clientId/:channelId",
+    "service": "TdlibChannelService.getChannel",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getChannelFullInfo",
+    "nodeEndpoint": "GET /tdlib/channels/full-info/:clientId/:channelId",
+    "service": "TdlibChannelService.getChannelFullInfo",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "editChannel",
+    "nodeEndpoint": "POST /tdlib/channels/edit",
+    "service": "TdlibChannelService.editChannel",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "editChannelAbout",
+    "nodeEndpoint": "POST /tdlib/channels/about",
+    "service": "TdlibChannelService.editChannelAbout",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "toggleChannelSignMessages",
+    "nodeEndpoint": "POST /tdlib/channels/toggle-sign-messages",
+    "service": "TdlibChannelService.toggleChannelSignMessages",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "toggleChannelIsAllHistoryAvailable",
+    "nodeEndpoint": "POST /tdlib/channels/toggle-history",
+    "service": "TdlibChannelService.toggleChannelIsAllHistoryAvailable",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "upgradeGroupChatToSupergroupChat",
+    "nodeEndpoint": "POST /tdlib/channels/upgrade-group",
+    "service": "TdlibChannelService.upgradeGroupChatToSupergroupChat",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getChannelMembers",
+    "nodeEndpoint": "GET /tdlib/channels/members/:clientId/:channelId",
+    "service": "TdlibChannelService.getChannelMembers",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getChannelAdministrators",
+    "nodeEndpoint": "GET /tdlib/channels/administrators/:clientId/:channelId",
+    "service": "TdlibChannelService.getChannelAdministrators",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getChannelMember",
+    "nodeEndpoint": "GET /tdlib/channels/member/:clientId/:channelId/:memberId",
+    "service": "TdlibChannelService.getChannelMember",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "searchChannelMembers",
+    "nodeEndpoint": "POST /tdlib/channels/members/search",
+    "service": "TdlibChannelService.searchChannelMembers",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "setChannelMemberStatus",
+    "nodeEndpoint": "POST /tdlib/channels/member/status",
+    "service": "TdlibChannelService.setChannelMemberStatus",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "banChannelMember",
+    "nodeEndpoint": "POST /tdlib/channels/member/ban",
+    "service": "TdlibChannelService.banChannelMember",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "canTransferOwnership",
+    "nodeEndpoint": "GET /tdlib/channels/can-transfer/:clientId",
+    "service": "TdlibChannelService.canTransferOwnership",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "transferChannelOwnership",
+    "nodeEndpoint": "POST /tdlib/channels/transfer-ownership",
+    "service": "TdlibChannelService.transferChannelOwnership",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getChannelStatistics",
+    "nodeEndpoint": "GET /tdlib/channels/statistics/:clientId/:channelId",
+    "service": "TdlibChannelService.getChannelStatistics",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getChannelMessageStatistics",
+    "nodeEndpoint": "GET /tdlib/channels/message-statistics/:clientId/:channelId/:messageId",
+    "service": "TdlibChannelService.getChannelMessageStatistics",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "reportChannel",
+    "nodeEndpoint": "POST /tdlib/channels/report",
+    "service": "TdlibChannelService.reportChannel",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getChannelAvailableReactions",
+    "nodeEndpoint": "GET /tdlib/channels/available-reactions/:clientId/:channelId",
+    "service": "TdlibChannelService.getChannelAvailableReactions",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "setChannelAvailableReactions",
+    "nodeEndpoint": "POST /tdlib/channels/available-reactions",
+    "service": "TdlibChannelService.setChannelAvailableReactions",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "setChannelStickerSet",
+    "nodeEndpoint": "POST /tdlib/channels/sticker-set",
+    "service": "TdlibChannelService.setChannelStickerSet",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "toggleChannelIsBroadcastGroup",
+    "nodeEndpoint": "POST /tdlib/channels/toggle-broadcast-group",
+    "service": "TdlibChannelService.toggleChannelIsBroadcastGroup",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getChannelRecommendations",
+    "nodeEndpoint": "GET /tdlib/channels/recommendations/:clientId/:channelId",
+    "service": "TdlibChannelService.getChannelRecommendations",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "viewChannelRecommendation",
+    "nodeEndpoint": "POST /tdlib/channels/recommendation/view",
+    "service": "TdlibChannelService.viewChannelRecommendation",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "editChatTitle",
+    "nodeEndpoint": "POST /tdlib/chats/title",
+    "service": "TdlibChatService.editChatTitle",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "editChatDescription",
+    "nodeEndpoint": "POST /tdlib/chats/description",
+    "service": "TdlibChatService.editChatDescription",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "setChatPhoto",
+    "nodeEndpoint": "POST /tdlib/chats/photo",
+    "service": "TdlibChatService.editChatPhoto",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "setChatAccentColors",
+    "nodeEndpoint": "POST /tdlib/chats/accent-colors",
+    "service": "TdlibChatService.setChatAccentColors",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "setChatProfileAccentColor",
+    "nodeEndpoint": "POST /tdlib/chats/profile-accent-color",
+    "service": "TdlibChatService.setChatProfileAccentColor",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "setChatPermissions",
+    "nodeEndpoint": "POST /tdlib/chats/permissions",
+    "service": "TdlibChatService.setChatPermissions",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "setChatSlowModeDelay",
+    "nodeEndpoint": "POST /tdlib/chats/slow-mode",
+    "service": "TdlibChatService.setChatSlowModeDelay",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "pinChatMessage",
+    "nodeEndpoint": "POST /tdlib/chats/pin-message",
+    "service": "TdlibChatService.pinChatMessage",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "unpinChatMessage",
+    "nodeEndpoint": "POST /tdlib/chats/unpin-message",
+    "service": "TdlibChatService.unpinChatMessage",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "unpinAllChatMessages",
+    "nodeEndpoint": "POST /tdlib/chats/unpin-all-messages",
+    "service": "TdlibChatService.unpinAllChatMessages",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "addChatMember",
+    "nodeEndpoint": "POST /tdlib/chats/member/add",
+    "service": "TdlibChatService.addChatMember",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "addChatMembers",
+    "nodeEndpoint": "POST /tdlib/chats/members/add",
+    "service": "TdlibChatService.addChatMembers",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "setChatMemberStatus",
+    "nodeEndpoint": "POST /tdlib/chats/member/status",
+    "service": "TdlibChatService.setChatMemberStatus",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "banChatMember",
+    "nodeEndpoint": "POST /tdlib/chats/member/ban",
+    "service": "TdlibChatService.banChatMember",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "canTransferOwnership",
+    "nodeEndpoint": "GET /tdlib/chats/can-transfer/:clientId",
+    "service": "TdlibChatService.canTransferOwnership",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "transferChatOwnership",
+    "nodeEndpoint": "POST /tdlib/chats/transfer-ownership",
+    "service": "TdlibChatService.transferChatOwnership",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getChatStatistics",
+    "nodeEndpoint": "GET /tdlib/chats/statistics/:clientId/:chatId",
+    "service": "TdlibChatService.getChatStatistics",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getChatMessageStatistics",
+    "nodeEndpoint": "GET /tdlib/chats/message-statistics/:clientId/:chatId/:messageId",
+    "service": "TdlibChatService.getChatMessageStatistics",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getChatMessageByDate",
+    "nodeEndpoint": "GET /tdlib/chats/message-by-date/:clientId/:chatId",
+    "service": "TdlibChatService.getChatMessageByDate",
+    "status": "implemented"
+  },
+  {
+    "tdApiMethod": "getChatScheduledMessages",
+    "nodeEndpoint": "GET /tdlib/chats/scheduled-messages/:clientId/:chatId",
+    "service": "TdlibChatService.getChatScheduledMessages",
+    "status": "implemented"
+  }
+]

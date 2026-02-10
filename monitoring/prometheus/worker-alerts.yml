@@ -1,0 +1,84 @@
+groups:
+  - name: worker
+    interval: 30s
+    rules:
+      - alert: WorkerProcessDown
+        expr: up{job="telegram-platform-worker"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Worker process is down"
+          description: "Worker process has been down for more than 2 minutes. Jobs are not being processed."
+
+      - alert: WorkerQueueBacklog
+        expr: worker_queue_depth > 1000
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Worker queue backlog is high"
+          description: "Queue depth is {{ $value }} (threshold: 1000). Worker may be overloaded."
+
+      - alert: WorkerHighFailureRate
+        expr: rate(worker_jobs_failed_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High worker job failure rate"
+          description: "Worker failure rate is {{ $value }} failures/sec (threshold: 10)"
+
+      - alert: WorkerHighProcessingTime
+        expr: histogram_quantile(0.95, rate(worker_processing_duration_seconds_bucket[5m])) > 30
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High worker processing time"
+          description: "P95 processing time is {{ $value }}s (threshold: 30s). Jobs are taking too long."
+
+      - alert: WorkerNoJobsProcessed
+        expr: rate(worker_jobs_processed_total[10m]) == 0 and worker_queue_depth > 0
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Worker not processing jobs"
+          description: "No jobs processed in the last 10 minutes but queue has {{ $value }} jobs waiting."
+
+      - alert: WorkerHighMemoryUsage
+        expr: process_resident_memory_bytes{job="telegram-platform-worker"} > 2147483648
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Worker high memory usage"
+          description: "Worker memory usage is {{ $value | humanize1024 }} (threshold: 2GB)"
+
+      - alert: WorkerHighCPUUsage
+        expr: rate(process_cpu_seconds_total{job="telegram-platform-worker"}[5m]) > 0.8
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Worker high CPU usage"
+          description: "Worker CPU usage is {{ $value | humanizePercentage }} (threshold: 80%)"
+
+      - alert: WorkerQueueServiceUnavailable
+        expr: worker_queue_depth == -1 or absent(worker_queue_depth)
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Worker queue service unavailable"
+          description: "Cannot connect to queue service. Worker cannot process jobs."
+
+      - alert: WorkerActiveJobsStuck
+        expr: worker_active_jobs > 0 and rate(worker_jobs_processed_total[10m]) == 0
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Worker jobs appear stuck"
+          description: "{{ $value }} active jobs but no jobs processed in the last 10 minutes."

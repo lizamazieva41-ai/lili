@@ -1,0 +1,83 @@
+# Dependencies
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Build outputs
+dist
+build
+*.tsbuildinfo
+
+# Testing
+coverage
+.nyc_output
+test
+tests
+*.test.ts
+*.spec.ts
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation (keep only essential)
+docs/*
+!docs/adr
+!docs/tdlib-*.md
+!docs/tdlib-*.json
+
+# CI/CD
+.github
+.gitlab-ci.yml
+Jenkinsfile
+
+# Temporary files
+tmp
+temp
+*.tmp
+
+# Backup files
+backups
+*.backup
+*.bak
+
+# Coverage reports
+coverage
+.nyc_output
+
+# TDLib build artifacts (will be built in Docker)
+td-master/build
+td-master/out
+
+# Keep TDLib source for building
+!td-master/CMakeLists.txt
+!td-master/td
+!td-master/tdnet
+!td-master/tdutils
+!td-master/tddb
+!td-master/tdactor
+!td-master/tdtl
+!td-master/sqlite
+!td-master/CMake
+!td-master/tdlib-version.json

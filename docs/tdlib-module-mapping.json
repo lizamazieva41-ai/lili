@@ -1,0 +1,33 @@
+[
+  {
+    "tdModule": "auth_states",
+    "tdSource": "td/telegram/td_authorization_state.*",
+    "nodeModule": "src/tdlib/tdlib-auth.service.ts",
+    "description": "Authorization state machine (request code, confirm code, password, etc.)."
+  },
+  {
+    "tdModule": "client_lifecycle",
+    "tdSource": "td/telegram/td_json_client.*",
+    "nodeModule": "src/tdlib/tdlib.service.ts + native/tdlib/tdlib_addon.cc",
+    "description": "Client creation, send/receive/execute via JSON interface."
+  },
+  {
+    "tdModule": "session_storage",
+    "tdSource": "tddb/*",
+    "nodeModule": "src/tdlib/tdlib-session.store.ts + Redis",
+    "description": "Session persistence and revocation, mapped to Redis-based store."
+  },
+  {
+    "tdModule": "logging",
+    "tdSource": "tdutils/td/utils/log.*",
+    "nodeModule": "src/common/services/logger.module.ts (CustomLoggerService)",
+    "description": "Logging and metrics integration, TDLib log hooks to be wired."
+  },
+  {
+    "tdModule": "network",
+    "tdSource": "tdnet/*",
+    "nodeModule": "TDLib C++ only (no rewrite); exposed via Node wrapper",
+    "description": "Network stack remains in C++; Node layer treats it as black box."
+  }
+]
+

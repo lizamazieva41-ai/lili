@@ -1,0 +1,9 @@
+# Husky git hooks
+#
+# This directory is git-ignored. Add your own hooks in .husky.
+#
+# To enable hooks, run:
+# npx husky install
+#
+# To uninstall hooks:
+# npx husky uninstall
